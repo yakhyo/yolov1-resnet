@@ -1,14 +1,10 @@
 ## YOLO: Real-Time Object Detection
-<hr>
+
 
 <div align='center'>
-  <img src='assets/person.jpg' height="250px">
-  <img src='assets/person.jpg' height="250px">
+  <img src='assets/person.jpg' height="300px">
+  <img src='assets/person.jpg' height="300px">
 </div>
-
-![](assets/person.jpg-)
-
-![](dog_result.jpg)
 
 **Train on voc2012+2007**
 
@@ -49,17 +45,12 @@ Each label consists of class and bounding box information. e.g `1xxx.txt` :
 
 **Evaluation:**
 - `python evaluation.py`
-- In `evaluation.py` 
-### 5. result
+- In `evaluation.py`, `im_show=False` change to `True` to see the results.
+
+
+
+**Reference:**
+1. 
 
 Our map in voc2007 test set is 0.665~ some result are below, you can see more in testimg folder.
 
-![](testimg/000283.jpg)
-
-![](testimg/000058.jpg)
-
-![](testimg/000059.jpg)
-
-![](testimg/000097.jpg)
-
-![](testimg/001757.jpg)
