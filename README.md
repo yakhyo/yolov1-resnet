@@ -2,8 +2,8 @@
 
 
 <div align='center'>
-  <img src='assets/person.jpg' height="300px">
-  <img src='assets/person.jpg' height="300px">
+  <img src='assets/person.jpg' height="250px">
+  <img src='assets/person.jpg' height="250px">
 </div>
 
 **Train on voc2012+2007**
