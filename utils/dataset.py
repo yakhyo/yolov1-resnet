@@ -17,7 +17,7 @@ class Dataset(data.Dataset):
     image_size = 448
 
     def __init__(self, root, file_names, train, transform):
-        print('data init')
+        print('DATA INITIALIZATION')
         self.root = root
         self.train = train
         self.transform = transform
