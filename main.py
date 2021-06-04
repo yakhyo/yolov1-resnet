@@ -13,9 +13,9 @@ from utils.dataset import Dataset
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 root = '../Datasets/'
-learning_rate = 0.001
-num_epochs = 20
-batch_size = 24
+learning_rate = 0.01
+num_epochs = 50
+batch_size = 128
 
 net = resnet50()
 
@@ -59,7 +59,7 @@ train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size,
 with open('../Dataset/test.txt') as f:
     test_names = f.readlines()
 test_dataset = Dataset(root, test_names, train=False, transform=[transforms.ToTensor()])
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size, shuffle=False,
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False,
                                           num_workers=os.cpu_count())
 
 print(f'NUMBER OF DATA SAMPLES: {len(train_dataset)}')
@@ -71,10 +71,8 @@ best_test_loss = np.inf
 for epoch in range(num_epochs):
     net.train()
     if epoch == 1:
-        learning_rate = 0.0005
-    if epoch == 2:
-        learning_rate = 0.00075
-    if epoch == 3:
+        learning_rate = learning_rate
+    if epoch == 20:
         learning_rate = 0.001
     if epoch == 30:
         learning_rate = 0.0001
@@ -118,7 +116,9 @@ for epoch in range(num_epochs):
 
     if best_test_loss > validation_loss:
         best_test_loss = validation_loss
-        torch.save(net.state_dict(), 'best.pth')
+
+        save = {'state_dict': net.state_dict()}
+        torch.save(save, 'best.pth')
 
     save = {'state_dict': net.state_dict()}
     torch.save(save, 'yolo.pth')
