@@ -105,7 +105,8 @@ def nms(b_boxes, scores, threshold=0.6):
         union = areas[i] + areas[order[1:]] - intersection
 
         over = intersection / union
-        ids = (over <= threshold).nonzero().squeeze()
+        ids = (over <= threshold)
+        ids = torch.nonzero(ids, as_tuple=False).squeeze()
         if ids.numel() == 0:
             break
         order = order[ids + 1]
