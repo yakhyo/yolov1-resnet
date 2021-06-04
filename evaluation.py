@@ -76,6 +76,7 @@ class Evaluation:
             nd = len(image_ids)
             tp = np.zeros(nd)
             fp = np.zeros(nd)
+
             for d, image_id in enumerate(image_ids):
                 bb = BB[d]
                 if (image_id, class_name) in self.targets:
@@ -112,6 +113,7 @@ class Evaluation:
             precision = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
 
             ap = self.compute_ap(recall, precision)
+
             print(f'{class_name}'.ljust(25, ' '), f'{ap:.2f}')
             aps.append(ap)
 
@@ -154,10 +156,10 @@ if __name__ == '__main__':
     if torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
 
-    model.load_state_dict(torch.load('yolo_.pth')['state_dict'])
+    model.load_state_dict(torch.load('yolo.pth')['state_dict'])
     model.eval()
 
-    # image_list = image_list[:500]
+    #     image_list = image_list[:500]
     for image_name in tqdm(image_list):
 
         result = predict_gpu(model, image_name, root_path='../Dataset/Images/')
@@ -179,7 +181,8 @@ if __name__ == '__main__':
                 cv2.rectangle(image, (p1[0] - 2 // 2, p1[1] - 2 - baseline),
                               (p1[0] + text_size[0], p1[1] + text_size[1]), color, -1)
 
-                cv2.putText(image, label, (p1[0], p1[1] + baseline), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, 8)
+                cv2.putText(image, label, (p1[0], p1[1] + baseline), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1,
+                            8)
 
             cv2.imshow('Prediction', image)
             cv2.waitKey(0)
