@@ -50,6 +50,7 @@ class Evaluation:
 
     def evaluate(self):
         aps = []
+        print('CLASS'.ljust(25, ' '), 'AP')
         for class_name in VOC_CLASSES:
             class_preds = self.predictions[class_name]  # [[image_id,confidence,x1,y1,x2,y2],...]
             if len(class_preds) == 0:
@@ -111,7 +112,7 @@ class Evaluation:
             precision = tp / np.maximum(tp + fp, np.finfo(np.float64).eps)
 
             ap = self.compute_ap(recall, precision)
-            print(f'CLASS: {class_name} \t\t AP: {ap:.2f}')
+            print(f'{class_name}'.ljust(25, ' '), f'{ap:.2f}')
             aps.append(ap)
 
         return aps
