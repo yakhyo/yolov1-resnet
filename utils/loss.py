@@ -10,17 +10,8 @@ class Loss(nn.Module):
         self.B = B
         self.l_coord = l_coord
         self.l_noobj = l_noobj
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.is_cuda = torch.cuda.is_available()
 
     def compute_iou(self, box1, box2):
-        '''Compute the intersection over union of two set of boxes, each box is [x1,y1,x2,y2].
-        Args:
-          box1: (tensor) bounding boxes, sized [N,4].
-          box2: (tensor) bounding boxes, sized [M,4].
-        Return:
-          (tensor) iou, sized [N,M].
-        '''
         N = box1.size(0)
         M = box2.size(0)
 
@@ -47,10 +38,6 @@ class Loss(nn.Module):
         return iou
 
     def forward(self, prediction, target):
-        '''
-        pred_tensor: (tensor) size(batchsize,S,S,Bx5+20=30) [x,y,w,h,c]
-        target_tensor: (tensor) size(batchsize,S,S,30)
-        '''
         N = prediction.size()[0]
         coo_mask = target[:, :, :, 4] > 0
         noo_mask = target[:, :, :, 4] == 0
@@ -65,14 +52,10 @@ class Loss(nn.Module):
         box_target = coo_target[:, :10].contiguous().view(-1, 5)
         class_target = coo_target[:, 10:]
 
-        # compute not contain obj loss
+        """Compute: Not Object Contains Loss"""
         noo_pred = prediction[noo_mask].view(-1, 30)
         noo_target = target[noo_mask].view(-1, 30)
-        if self.is_cuda:
-            noo_pred_mask = torch.cuda.BoolTensor(noo_pred.size())
-        else:
-            noo_pred_mask = torch.BoolTensor(noo_pred.size())
-
+        noo_pred_mask = torch.cuda.BoolTensor(noo_pred.size())
         noo_pred_mask.zero_()
         noo_pred_mask[:, 4] = 1
         noo_pred_mask[:, 9] = 1
@@ -80,67 +63,47 @@ class Loss(nn.Module):
         noo_target_c = noo_target[noo_pred_mask]
         nooobj_loss = F.mse_loss(noo_pred_c, noo_target_c, reduction='sum')
 
-        # compute contain obj loss
-        if self.is_cuda:
-            coo_response_mask = torch.cuda.BoolTensor(box_target.size())
-        else:
-            coo_response_mask = torch.BoolTensor(box_target.size())
-
+        """Compute: Object Contains Loss"""
+        coo_response_mask = torch.cuda.BoolTensor(box_target.size())
         coo_response_mask.zero_()
-        if self.is_cuda:
-            coo_not_response_mask = torch.cuda.BoolTensor(box_target.size())
-        else:
-            coo_not_response_mask = torch.BoolTensor(box_target.size())
-
+        coo_not_response_mask = torch.cuda.BoolTensor(box_target.size())
         coo_not_response_mask.zero_()
         box_target_iou = torch.zeros(box_target.size()).cuda()
-        for i in range(0, box_target.size()[0], 2):
-
+        for i in range(0, box_target.size()[0], 2):  # choose the best iou box
             box1 = box_pred[i:i + 2]
             box1_xyxy = torch.FloatTensor(box1.size())
             box1_xyxy[:, :2] = box1[:, :2] / 14. - 0.5 * box1[:, 2:4]
             box1_xyxy[:, 2:4] = box1[:, :2] / 14. + 0.5 * box1[:, 2:4]
-
             box2 = box_target[i].view(-1, 5)
             box2_xyxy = torch.FloatTensor(box2.size())
             box2_xyxy[:, :2] = box2[:, :2] / 14. - 0.5 * box2[:, 2:4]
             box2_xyxy[:, 2:4] = box2[:, :2] / 14. + 0.5 * box2[:, 2:4]
-
-            iou = self.compute_iou(box1_xyxy[:, :4], box2_xyxy[:, :4])
+            iou = self.compute_iou(box1_xyxy[:, :4], box2_xyxy[:, :4])  # [2,1]
             max_iou, max_index = iou.max(0)
             max_index = max_index.data.cuda()
 
             coo_response_mask[i + max_index] = 1
             coo_not_response_mask[i + 1 - max_index] = 1
 
-            if self.is_cuda:
-                box_target_iou[i + max_index, torch.LongTensor([4]).to(self.device)] = max_iou.data.to(self.device)
-            else:
-                box_target_iou[i + max_index, torch.LongTensor([4])] = max_iou.data
-
-        if self.is_cuda:
-            box_target_iou = box_target_iou.cuda()
-        else:
-            box_target_iou = box_target_iou
-
-        # 1.response loss
+            box_target_iou[i + max_index, torch.LongTensor([4]).cuda()] = max_iou.data.cuda()
+        box_target_iou = box_target_iou.cuda()
+        """Response Loss"""
         box_pred_response = box_pred[coo_response_mask].view(-1, 5)
         box_target_response_iou = box_target_iou[coo_response_mask].view(-1, 5)
         box_target_response = box_target[coo_response_mask].view(-1, 5)
         contain_loss = F.mse_loss(box_pred_response[:, 4], box_target_response_iou[:, 4], reduction='sum')
         loc_loss = F.mse_loss(box_pred_response[:, :2], box_target_response[:, :2], reduction='sum') + F.mse_loss(
             torch.sqrt(box_pred_response[:, 2:4]), torch.sqrt(box_target_response[:, 2:4]), reduction='sum')
-        # 2.not response loss
+        """Not Response Loss"""
         box_pred_not_response = box_pred[coo_not_response_mask].view(-1, 5)
         box_target_not_response = box_target[coo_not_response_mask].view(-1, 5)
         box_target_not_response[:, 4] = 0
 
         not_contain_loss = F.mse_loss(box_pred_not_response[:, 4], box_target_not_response[:, 4], reduction='sum')
 
-        # 3.class loss
+        """Class Loss"""
         class_loss = F.mse_loss(class_pred, class_target, reduction='sum')
 
-        loss = (
-                           self.l_coord * loc_loss + 2 * contain_loss + not_contain_loss + self.l_noobj * nooobj_loss + class_loss) / N
+        loss = self.l_coord * loc_loss + 2 * contain_loss + not_contain_loss + self.l_noobj * nooobj_loss + class_loss
 
-        return loss
+        return loss / N

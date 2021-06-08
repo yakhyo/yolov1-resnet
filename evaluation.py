@@ -156,10 +156,10 @@ if __name__ == '__main__':
     if torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
 
-    model.load_state_dict(torch.load('yolo.pth')['state_dict'])
+    model.load_state_dict(torch.load('best.pth')['state_dict'])
     model.eval()
 
-    #     image_list = image_list[:500]
+    # image_list = image_list[:500]
     for image_name in tqdm(image_list):
 
         result = predict_gpu(model, image_name, root_path='../Dataset/Images/')
@@ -190,6 +190,6 @@ if __name__ == '__main__':
     if not im_show:
         print('\nSTART EVALUATION...')
 
-        aps = Evaluation(predictions, targets, threshold=0.6).evaluate()
+        aps = Evaluation(predictions, targets, threshold=0.4).evaluate()
         print(f'mAP: {np.mean(aps):.2f}')
         print('\nDONE.')

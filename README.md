@@ -47,10 +47,31 @@ Each label consists of class and bounding box information. e.g `1xxx.txt` :
 - `python evaluation.py`
 - In `evaluation.py`, `im_show=False` change to `True` to see the results.
 
-
+Result:
+```text
+CLASS                     AP
+aeroplane                 0.59
+bicycle                   0.60
+bird                      0.50
+boat                      0.31
+bottle                    0.19
+bus                       0.66
+car                       0.59
+cat                       0.77
+chair                     0.24
+cow                       0.55
+diningtable               0.42
+dog                       0.70
+horse                     0.66
+motorbike                 0.60
+person                    0.54
+pottedplant               0.23
+sheep                     0.48
+sofa                      0.44
+train                     0.71
+tvmonitor                 0.54
+mAP: 0.52
+```
 
 **Reference:**
-1. 
-
-Our map in voc2007 test set is 0.665~ some result are below, you can see more in testimg folder.
-
+1. https://github.com/abeardear/pytorch-YOLO-v1

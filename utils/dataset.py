@@ -1,5 +1,4 @@
 import os
-import sys
 import os.path
 
 import random
@@ -7,10 +6,8 @@ import numpy as np
 
 import torch
 import torch.utils.data as data
-import torchvision.transforms as transforms
 
 import cv2
-import matplotlib.pyplot as plt
 
 
 class Dataset(data.Dataset):
@@ -18,7 +15,8 @@ class Dataset(data.Dataset):
 
     def __init__(self, root, file_names, train, transform):
         print('DATA INITIALIZATION')
-        self.root = root
+        self.root_img = os.path.join(root, 'Images')
+        self.root_txt = os.path.join(root, 'Labels')
         self.train = train
         self.transform = transform
         self.fnames = []
@@ -28,23 +26,22 @@ class Dataset(data.Dataset):
 
         for line in file_names:
             line = line.rstrip()
-            with open(f"../Dataset/Labels/{line}.txt") as f:
+            with open(f"{self.root_txt}/{line}.txt") as f:
                 objects = f.readlines()
                 self.fnames.append(line + '.jpg')
                 box = []
                 label = []
                 for object in objects:
-                    c, x1, y1, x2, y2 = map(int, object.rstrip().split())
+                    c, x1, y1, x2, y2 = map(float, object.rstrip().split())
                     box.append([x1, y1, x2, y2])
-                    label.append(c + 1)
+                    label.append(int(c) + 1)
                 self.boxes.append(torch.Tensor(box))
                 self.labels.append(torch.LongTensor(label))
         self.num_samples = len(self.boxes)
 
     def __getitem__(self, idx):
         fname = self.fnames[idx]
-        # self.root += 'Images/'
-        img = cv2.imread(os.path.join('../Dataset/Images/' + fname))
+        img = cv2.imread(os.path.join(self.root_img, fname))
         boxes = self.boxes[idx].clone()
         labels = self.labels[idx].clone()
 
@@ -59,7 +56,7 @@ class Dataset(data.Dataset):
             img, boxes, labels = self.randomShift(img, boxes, labels)
             img, boxes, labels = self.randomCrop(img, boxes, labels)
 
-        # #debug
+        # # debug
         # box_show = boxes.numpy().reshape(-1)
         # print(box_show)
         # img_show = self.BGR2RGB(img)
@@ -70,7 +67,7 @@ class Dataset(data.Dataset):
         # # cv2.rectangle(img,pt1=(10,10),pt2=(100,100),color=(0,255,0),thickness=1)
         # plt.imshow(img_show)
         # plt.show()
-        # #debug
+        # # debug
 
         h, w, _ = img.shape
         boxes /= torch.Tensor([w, h, w, h]).expand_as(boxes)
@@ -94,7 +91,7 @@ class Dataset(data.Dataset):
         cxcy = (boxes[:, 2:] + boxes[:, :2]) / 2
         for i in range(cxcy.size()[0]):
             cxcy_sample = cxcy[i]
-            ij = (cxcy_sample / cell_size).ceil() - 1  #
+            ij = (cxcy_sample / cell_size).ceil() - 1
             target[int(ij[1]), int(ij[0]), 4] = 1
             target[int(ij[1]), int(ij[0]), 9] = 1
             target[int(ij[1]), int(ij[0]), int(labels[i]) + 9] = 1
@@ -154,7 +151,6 @@ class Dataset(data.Dataset):
         return bgr
 
     def randomShift(self, bgr, boxes, labels):
-        # 平移变换
         center = (boxes[:, 2:] + boxes[:, :2]) / 2
         if random.random() < 0.5:
             height, width, c = bgr.shape
@@ -162,8 +158,7 @@ class Dataset(data.Dataset):
             after_shfit_image[:, :, :] = (104, 117, 123)  # bgr
             shift_x = random.uniform(-width * 0.2, width * 0.2)
             shift_y = random.uniform(-height * 0.2, height * 0.2)
-            # print(bgr.shape,shift_x,shift_y)
-            # 原图像的平移
+
             if shift_x >= 0 and shift_y >= 0:
                 after_shfit_image[int(shift_y):, int(shift_x):, :] = bgr[:height - int(shift_y), :width - int(shift_x),
                                                                      :]
@@ -193,7 +188,6 @@ class Dataset(data.Dataset):
         return bgr, boxes, labels
 
     def randomScale(self, bgr, boxes):
-        # 固定住高度，以0.8-1.2伸缩宽度，做图像形变
         if random.random() < 0.5:
             scale = random.uniform(0.8, 1.2)
             height, width, c = bgr.shape
@@ -219,7 +213,7 @@ class Dataset(data.Dataset):
             mask = (mask1 & mask2).view(-1, 1)
 
             boxes_in = boxes[mask.expand_as(boxes)].view(-1, 4)
-            if (len(boxes_in) == 0):
+            if len(boxes_in) == 0:
                 return bgr, boxes, labels
             box_shift = torch.FloatTensor([[x, y, x, y]]).expand_as(boxes_in)
 
@@ -261,8 +255,10 @@ class Dataset(data.Dataset):
 def main():
     from torch.utils.data import DataLoader
     import torchvision.transforms as transforms
-    file_root = '../../Dataset/Images/'
-    train_dataset = Dataset(root=file_root, f_names='../Dataset/train.txt', train=True,
+    file_root = '../Dataset/Images/'
+    with open('../Dataset/train.txt') as f:
+        train_names = f.readlines()
+    train_dataset = Dataset(root=file_root, file_names=train_names, train=True,
                             transform=[transforms.ToTensor()])
     train_loader = DataLoader(train_dataset, batch_size=1, shuffle=False, num_workers=os.cpu_count() - 2)
     train_iter = iter(train_loader)

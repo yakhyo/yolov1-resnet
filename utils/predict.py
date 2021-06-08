@@ -77,7 +77,7 @@ def decoder(prediction):
     return boxes[keep], cls_indexes[keep], confidences[keep]
 
 
-def nms(b_boxes, scores, threshold=0.6):
+def nms(b_boxes, scores, threshold=0.5):
     x1 = b_boxes[:, 0]
     y1 = b_boxes[:, 1]
     x2 = b_boxes[:, 2]
@@ -152,7 +152,7 @@ if __name__ == '__main__':
     if torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
 
-    model.load_state_dict(torch.load('yolo_.pth')['state_dict'])
+    model.load_state_dict(torch.load('yolo.pth')['state_dict'])
     model.eval()
     image_name = 'assets/person.jpg'
     image = cv2.imread(image_name)
