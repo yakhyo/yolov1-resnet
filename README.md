@@ -10,8 +10,9 @@
 
 | Model                | Backbone | mAP@voc2007test  | FPS  |
 | -------------------- | -------------- | ---------- | -------   |
-| ResNet YOLOv1  |   ResNet50        | _training_   |  ___   |
-| YOLOv1  |   darknet19        | 63.4%      |  45   |
+| ResNet YOLOv1  |   ResNet50        | 0.65  |  __   |
+| YOLOv1  |   darknet19        | 0.634      |  45   |
+
 
 **Dataset:**
 1. Download `voc2012train` [dataset](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar)
@@ -44,33 +45,40 @@ Each label consists of class and bounding box information. e.g `1xxx.txt` :
 - `python main.py`
 
 **Evaluation:**
-- `python evaluation.py`
+- `python eval.py`
 - In `evaluation.py`, `im_show=False` change to `True` to see the results.
+
+**Detection:**
+ - To show the result image - `python detect.py --image assets/person.jpg`
+ - Save result image - `python detect.py --image assets/person.jpg --save_img` 
+
+**Weights:**
+- Run the `download.sh` file in `weights` folder or download from this [link](https://www.dropbox.com/sh/nde76eig64rm02p/AADCumUHtwJgzyQeN2VvzBTxa?dl=0)
 
 Result:
 ```text
 CLASS                     AP
-aeroplane                 0.59
-bicycle                   0.60
-bird                      0.50
-boat                      0.31
-bottle                    0.19
-bus                       0.66
-car                       0.59
-cat                       0.77
-chair                     0.24
-cow                       0.55
-diningtable               0.42
-dog                       0.70
-horse                     0.66
-motorbike                 0.60
-person                    0.54
-pottedplant               0.23
-sheep                     0.48
-sofa                      0.44
-train                     0.71
-tvmonitor                 0.54
-mAP: 0.52
+aeroplane                 0.71
+bicycle                   0.72
+bird                      0.71
+boat                      0.59
+bottle                    0.39
+bus                       0.70
+car                       0.78
+cat                       0.83
+chair                     0.43
+cow                       0.69
+diningtable               0.51
+dog                       0.77
+horse                     0.77
+motorbike                 0.65
+person                    0.74
+pottedplant               0.37
+sheep                     0.65
+sofa                      0.57
+train                     0.83
+tvmonitor                 0.58
+mAP: 0.65
 ```
 
 **Reference:**

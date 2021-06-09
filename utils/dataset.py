@@ -15,20 +15,20 @@ class Dataset(data.Dataset):
 
     def __init__(self, root, file_names, train, transform):
         print('DATA INITIALIZATION')
-        self.root_img = os.path.join(root, 'Images')
-        self.root_txt = os.path.join(root, 'Labels')
+        self.root_images = os.path.join(root, 'Images')
+        self.root_labels = os.path.join(root, 'Labels')
         self.train = train
         self.transform = transform
-        self.fnames = []
+        self.f_names = []
         self.boxes = []
         self.labels = []
         self.mean = (123, 117, 104)  # RGB
 
         for line in file_names:
             line = line.rstrip()
-            with open(f"{self.root_txt}/{line}.txt") as f:
+            with open(f"{self.root_labels}/{line}.txt") as f:
                 objects = f.readlines()
-                self.fnames.append(line + '.jpg')
+                self.f_names.append(line + '.jpg')
                 box = []
                 label = []
                 for object in objects:
@@ -40,8 +40,8 @@ class Dataset(data.Dataset):
         self.num_samples = len(self.boxes)
 
     def __getitem__(self, idx):
-        fname = self.fnames[idx]
-        img = cv2.imread(os.path.join(self.root_img, fname))
+        f_name = self.f_names[idx]
+        img = cv2.imread(os.path.join(self.root_images, f_name))
         boxes = self.boxes[idx].clone()
         labels = self.labels[idx].clone()
 
@@ -255,7 +255,7 @@ class Dataset(data.Dataset):
 def main():
     from torch.utils.data import DataLoader
     import torchvision.transforms as transforms
-    file_root = '../Dataset/Images/'
+    file_root = '../Dataset'
     with open('../Dataset/train.txt') as f:
         train_names = f.readlines()
     train_dataset = Dataset(root=file_root, file_names=train_names, train=True,

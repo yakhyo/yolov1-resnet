@@ -77,7 +77,7 @@ def decoder(prediction):
     return boxes[keep], cls_indexes[keep], confidences[keep]
 
 
-def nms(b_boxes, scores, threshold=0.5):
+def nms(b_boxes, scores, threshold=0.2):
     x1 = b_boxes[:, 0]
     y1 = b_boxes[:, 1]
     x2 = b_boxes[:, 2]
@@ -105,15 +105,15 @@ def nms(b_boxes, scores, threshold=0.5):
         union = areas[i] + areas[order[1:]] - intersection
 
         over = intersection / union
-        ids = (over <= threshold)
-        ids = torch.nonzero(ids, as_tuple=False).squeeze()
+        ids = (over <= threshold).nonzero().squeeze()
+        # ids = torch.nonzero(ids, as_tuple=False).squeeze()
         if ids.numel() == 0:
             break
         order = order[ids + 1]
     return torch.LongTensor(keep)
 
 
-def predict_gpu(model, img_name, root_path=''):
+def predict(model, img_name, root_path=''):
     results = []
     img = cv2.imread(root_path + img_name)
     h, w, _ = img.shape
@@ -158,7 +158,7 @@ if __name__ == '__main__':
     image = cv2.imread(image_name)
 
     print('\nPREDICTING...')
-    result = predict_gpu(model, image_name)
+    result = predict(model, image_name)
 
     for x1y1, x2y2, class_name, _, prob in result:
         color = COLORS[class_name]
@@ -172,5 +172,6 @@ if __name__ == '__main__':
                       color, -1)
         cv2.putText(image, label, (p1[0], p1[1] + baseline), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1, 8)
 
+    cv2.imwrite('result.jpg', image)
     cv2.imshow('Prediction', image)
     cv2.waitKey(0)

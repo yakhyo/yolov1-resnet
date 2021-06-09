@@ -12,13 +12,13 @@ from utils.dataset import Dataset
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-root = '../Dataset'
-learning_rate = 0.01
+root = '../Dataset/'
+learning_rate = 0.001
 num_epochs = 20
 batch_size = 32
 
 net = resnet50()
-
+print(net)
 resnet = torchvision.models.resnet50(pretrained=True)
 new_state_dict = resnet.state_dict()
 
@@ -120,7 +120,7 @@ for epoch in range(num_epochs):
         best_test_loss = validation_loss
 
         save = {'state_dict': net.state_dict()}
-        torch.save(save, 'best_.pth')
+        torch.save(save, 'weights/best.pth')
 
     save = {'state_dict': net.state_dict()}
-    torch.save(save, 'yolo_.pth')
+    torch.save(save, 'weights/yolo.pth')
