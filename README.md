@@ -22,16 +22,16 @@
 ```
 ├── Dataset 
     ├── Images
-        ├── 1111.jpg
-        ├── 2222.jpg
+        ├── 0001.jpg
+        ├── 0002.jpg
     ├── Labels
-        ├── 1111.txt
-        ├── 2222.txt
+        ├── 0001.txt
+        ├── 0002.txt
     ├── train.txt
     ├── test.txt
 ```
 
-Each label consists of class and bounding box information. e.g `1xxx.txt` : 
+Each label consists of class and bounding box information. e.g `0001.txt` : 
 ```
 1 255 247 425 468
 0 470 105 680 468
