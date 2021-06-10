@@ -120,7 +120,7 @@ for epoch in range(num_epochs):
         best_test_loss = validation_loss
 
         save = {'state_dict': net.state_dict()}
-        torch.save(save, 'weights/best.pth')
+        torch.save(save, 'best.pth')
 
     save = {'state_dict': net.state_dict()}
-    torch.save(save, 'weights/yolo.pth')
+    torch.save(save, 'yolo.pth')
