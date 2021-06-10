@@ -77,7 +77,7 @@ def decoder(prediction):
     return boxes[keep], cls_indexes[keep], confidences[keep]
 
 
-def nms(b_boxes, scores, threshold=0.2):
+def nms(b_boxes, scores, threshold=0.5):
     x1 = b_boxes[:, 0]
     y1 = b_boxes[:, 1]
     x2 = b_boxes[:, 2]
