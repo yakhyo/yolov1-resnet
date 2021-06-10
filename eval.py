@@ -156,7 +156,7 @@ if __name__ == '__main__':
     if torch.cuda.device_count() > 1:
         model = nn.DataParallel(model)
 
-    model.load_state_dict(torch.load('best.pth')['state_dict'])
+    model.load_state_dict(torch.load('yolo.pth')['state_dict'])
     model.eval()
 
     # image_list = image_list[:500]
