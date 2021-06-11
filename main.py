@@ -16,6 +16,10 @@ root = '../Dataset/'
 learning_rate = 0.001
 num_epochs = 20
 batch_size = 32
+seed = 42
+
+np.random.seed(seed)
+torch.manual_seed(seed)
 
 net = resnet50()
 print(net)
