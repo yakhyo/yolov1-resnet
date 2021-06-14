@@ -22,7 +22,7 @@ np.random.seed(seed)
 torch.manual_seed(seed)
 
 net = resnet50()
-print(net)
+
 resnet = torchvision.models.resnet50(pretrained=True)
 new_state_dict = resnet.state_dict()
 
@@ -63,7 +63,7 @@ train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size,
 with open('../Dataset/test.txt') as f:
     test_names = f.readlines()
 test_dataset = Dataset(root, test_names, train=False, transform=[transforms.ToTensor()])
-test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=16, shuffle=False,
+test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=batch_size // 2, shuffle=False,
                                           num_workers=os.cpu_count())
 
 print(f'NUMBER OF DATA SAMPLES: {len(train_dataset)}')
