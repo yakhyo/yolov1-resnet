@@ -47,7 +47,7 @@ def detect(args):
         model = nn.DataParallel(model)
 
     # if you have single gpu then please modify model loading process
-    model.load_state_dict(torch.load('weights/yolo.pth')['state_dict'])
+    model.load_state_dict(torch.load('yolo.pth')['state_dict'])
     model.eval()
     image_name = args.image
     image = cv2.imread(image_name)
