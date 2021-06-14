@@ -10,7 +10,7 @@
 
 | Model                | Backbone | mAP@voc2007test  | FPS  |
 | -------------------- | -------------- | ---------- | -------   |
-| ResNet YOLOv1  |   ResNet50        | 0.65  |  __   |
+| ResNet YOLOv1  |   ResNet50        | 0.49  |  __   |
 | YOLOv1  |   darknet19        | 0.634      |  45   |
 
 
@@ -58,32 +58,31 @@ Each label consists of class and bounding box information. e.g `0001.txt` :
 Result:
 ```text
 CLASS                     AP
-aeroplane                 0.71
-bicycle                   0.72
-bird                      0.71
-boat                      0.59
-bottle                    0.39
-bus                       0.70
-car                       0.78
-cat                       0.83
-chair                     0.43
-cow                       0.69
-diningtable               0.51
-dog                       0.77
-horse                     0.77
-motorbike                 0.65
-person                    0.74
-pottedplant               0.37
-sheep                     0.65
-sofa                      0.57
-train                     0.83
-tvmonitor                 0.58
-mAP: 0.65
+aeroplane                 0.54
+bicycle                   0.60
+bird                      0.48
+boat                      0.28
+bottle                    0.16
+bus                       0.63
+car                       0.59
+cat                       0.71
+chair                     0.24
+cow                       0.48
+diningtable               0.39
+dog                       0.64
+horse                     0.58
+motorbike                 0.59
+person                    0.51
+pottedplant               0.17
+sheep                     0.47
+sofa                      0.50
+train                     0.69
+tvmonitor                 0.46
+mAP: 0.49
 ```
 
-underconstruction...
 
 any questions are welcome... 
 
 **Reference:**
-1. https://github.com/abeardear/pytorch-YOLO-v1
+ - https://github.com/abeardear/pytorch-YOLO-v1
